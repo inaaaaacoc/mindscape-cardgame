@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MINDSCAPE - Card Game Peer Support</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple: #6c5ce7;
+      --green: #00b894;
+      --green-light: #55efc4;
+      --bg: #f8fff9;
+      --text: #2d3436;
+      --muted: #636e72;
+      --shadow: 0 15px 35px rgba(108,92,231,0.18);
+      --shadow-lg: 0 25px 50px rgba(0,184,148,0.22);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Poppins',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+
+    /* Navbar */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:1000;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:16px 5%; background:rgba(255,255,255,0.95); backdrop-filter:blur(12px);
+      box-shadow:0 4px 20px rgba(108,92,231,0.12); border-bottom:1px solid rgba(108,92,231,0.1);
+    }
+    .logo { font-size:1.6rem; font-weight:800;
+      background:linear-gradient(90deg,var(--purple),var(--green));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    nav ul { display:flex; gap:32px; list-style:none; }
+    nav a { text-decoration:none; color:var(--text); font-weight:600; cursor:pointer; position:relative; }
+    nav a:hover, nav a.active { color:var(--purple); }
+    nav a.active::after { content:''; position:absolute; bottom:-8px; left:0; right:0; height:3px;
+      background:linear-gradient(90deg,var(--purple),var(--green)); border-radius:3px; }
+
+    .page { display:none; min-height:100vh; padding-top:90px; }
+    .page.active { display:block; animation:fadeIn 0.8s ease; }
+    @keyframes fadeIn { from {opacity:0; transform:translateY(30px);} to {opacity:1; transform:none;} }
+
+    /* HERO */
+    .hero {
+      min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;
+      text-align:center; color:white; overflow:hidden;
+      background: linear-gradient(135deg, var(--purple), var(--green)),
+                  url('https://images.unsplash.com/photo-1524502397800-2ee8221518f7?w=1600') center/cover no-repeat;
+      background-blend-mode: overlay;
+    }
+    .hero h1 { font-size: 5.8rem !important; font-weight: 900; text-shadow: 0 8px 40px rgba(0,0,0,0.7);
+      margin-bottom: 28px; letter-spacing: -2px; line-height: 1; }
+    .hero p { font-size: 1.8rem !important; font-weight: 500; opacity: 0.98; margin-bottom: 70px;
+      max-width: 800px; line-height: 1.4; }
+    .btn {
+      padding:18px 50px; border-radius:50px; font-weight:700; font-size:1.2rem;
+      cursor:pointer; transition:all .4s; border:none; box-shadow:0 12px 35px rgba(108,92,231,0.4);
+      margin:12px;
+    }
+    .btn-primary { background:white; color:var(--purple); }
+    .btn-primary:hover { transform:translateY(-8px); }
+    .btn-green { background:var(--green); color:white; }
+    .btn-green:hover { background:var(--purple); }
+
+    section { padding:120px 5%; text-align:center; }
+    h2 {
+      font-size:2.8rem; margin-bottom:70px;
+      background:linear-gradient(90deg,var(--purple),var(--green));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:800;
+    }
+
+    /* Kategori Cards */
+    .category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+      gap:40px; max-width:1200px; margin:0 auto; }
+    .cat-card { height:420px; border-radius:28px; overflow:hidden; box-shadow:var(--shadow);
+      transition:all .5s; cursor:pointer; position:relative; pointer-events:auto; }
+    .cat-card:hover { transform:translateY(-20px) scale(1.05); box-shadow:var(--shadow-lg); }
+    .cat-card img { width:100%; height:100%; object-fit:cover; transition:0.5s; }
+    .cat-card:hover img { transform:scale(1.15); }
+    .cat-overlay { position:absolute; inset:0; background:linear-gradient(transparent 30%,rgba(0,0,0,0.9));
+      display:flex; flex-direction:column; justify-content:end; padding:40px 24px;
+      color:white; pointer-events:none; }
+
+    /* FEEDBACK – 100% ANONIM & SUPER MENARIK */
+    .feedback-section {
+      padding: 160px 5% 120px;
+      background: linear-gradient(135deg, #f8f2ff 0%, #e6fff9 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .feedback-section::before {
+      content: '“'; position: absolute; top: 30px; left: -50px; font-size: 30rem;
+      color: rgba(108,92,231,0.07); font-family: Georgia; pointer-events: none;
+    }
+    .feedback-section h2 {
+      font-size: 3.2rem; margin-bottom: 90px;
+    }
+    .feedback-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 50px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .feedback-card {
+      background: white;
+      padding: 50px 40px;
+      border-radius: 36px;
+      box-shadow: 0 20px 50px rgba(108,92,231,0.18);
+      transition: all 0.5s ease;
+      position: relative;
+      text-align: center;
+      border: 2px solid transparent;
+    }
+    .feedback-card:hover {
+      transform: translateY(-20px) scale(1.03);
+      box-shadow: 0 35px 70px rgba(108,92,231,0.28);
+      border: 2px solid var(--purple);
+    }
+    .feedback-card::before {
+      content: '“';
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12rem;
+      color: var(--purple);
+      opacity: 0.1;
+      font-family: Georgia;
+      pointer-events: none;
+    }
+    .feedback-text {
+      font-size: 1.35rem;
+      line-height: 1.9;
+      color: #333;
+      font-style: italic;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 1;
+    }
+    .feedback-name {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--purple);
+      margin-top: 20px;
+    }
+
+    /* Game Page (tetap cantik seperti versi sebelumnya) */
+    .game-board-img { max-width:1000px; width:100%; border-radius:32px;
+      border:14px solid var(--purple); box-shadow:var(--shadow-lg); margin:70px auto; display:block; }
+    .game-board-img:hover { transform: scale(1.02); transition: 0.5s; }
+    .cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+      gap:40px; max-width:1200px; margin:80px auto; }
+    .card-example { background:white; padding:40px 32px; border-radius:32px;
+      box-shadow:var(--shadow); border-left:10px solid var(--green); transition:all 0.4s; }
+    .card-example:hover { transform:translateY(-12px); box-shadow:var(--shadow-lg); }
+    .card-example strong { font-size:1.5rem; color:var(--green); display:block; margin-bottom:20px; }
+    .how-to { max-width:1000px; margin:100px auto; background:white; padding:60px;
+      border-radius:32px; box-shadow:var(--shadow-lg); text-align:left; }
+    .how-to li { font-size:1.25rem; margin-bottom:28px; padding-left:10px; }
+
+    /* Survey & Footer */
+    .survey-container { max-width:1000px; margin:0 auto; background:white; padding:50px;
+      border-radius:28px; box-shadow:var(--shadow-lg); }
+    iframe { width:100%; height:1000px; border:none; border-radius:20px; }
+    .back-btn { padding:16px 50px; background:var(--purple); color:white; border-radius:50px;
+      font-weight:600; cursor:pointer; transition:0.3s; }
+    .back-btn:hover { background:var(--green); transform:scale(1.08); }
+    footer { text-align:center; padding:80px 20px; background:#2d3436; color:#bdc3c7; margin-top:100px; }
+    footer a { color:var(--green-light); text-decoration:none; font-weight:600; }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 4.2rem !important; }
+      .hero p { font-size: 1.4rem !important; }
+      .feedback-section h2 { font-size: 2.6rem; }
+      .feedback-text { font-size: 1.2rem; }
+      .feedback-card { padding: 40px 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">MINDSCAPE</div>
+    <ul>
+      <li><a onclick="showPage('home')" class="active">Beranda</a></li>
+      <li><a onclick="showPage('game')">Permainan</a></li>
+      <li><a onclick="showPage('survey')">Survei</a></li>
+    </ul>
+  </nav>
+
+  <!-- BERANDA -->
+  <div id="home" class="page active">
+    <section class="hero">
+      <h1>Mindscape Card Game</h1>
+      <p>Main kartu, buka cerita, temukan diri, temukan teman seperjuangan.</p>
+      <div>
+        <button class="btn btn-primary" onclick="showPage('game')">Pelajari & Main Sekarang</button>
+        <button class="btn btn-green" onclick="showPage('survey')">Isi Survei (2 menit)</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Pilih Topik yang Ingin Dibahas</h2>
+      <div class="category-grid">
+        <div class="cat-card" onclick="showPage('game')">
+          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200" alt="Teman">
+          <div class="cat-overlay"><h3>Teman & Relasi</h3><p>Batasan, dukungan, drama pertemanan, atau rasa kesepian.</p></div>
+        </div>
+        <div class="cat-card" onclick="showPage('game')">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=1200" alt="Diri Sendiri">
+          <div class="cat-overlay"><h3>Diri Sendiri</h3><p>Self-love, emosi, mimpi, dan kedamaian batin.</p></div>
+        </div>
+        <div class="cat-card" onclick="showPage('game')">
+          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200" alt="Studi & Masa Depan">
+          <div class="cat-overlay"><h3>Studi & Masa Depan</h3><p>Tekanan akademik, motivasi, dan mimpi ke depan.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEEDBACK – ANONIM TAPI SANGAT MENARIK -->
+    <section class="feedback-section">
+      <h2>Apa Kata Mereka?</h2>
+      <div class="feedback-grid">
+        <div class="feedback-card">
+          <p class="feedback-text">
+            Awalnya ragu, tapi setelah main satu ronde, kami semua nangis bareng. Akhirnya bisa cerita hal-hal yang selama ini dipendem.
+          </p>
+          <div class="feedback-name">— Mahasiswa Psikologi</div>
+        </div>
+        <div class="feedback-card">
+          <p class="feedback-text">
+            Kartunya bikin kita saling dengerin beneran. Bukan cuma ‘iya iya’ doang. Rekomendasi banget buat circle yang pengen lebih deket.
+          </p>
+          <div class="feedback-name">— Anggota BEM</div>
+        </div>
+        <div class="feedback-card">
+          <p class="feedback-text">
+            Main ini sama temen kos pas weekend. Tiba-tiba jam 2 pagi kita masih cerita. Mindscape emang beda!
+          </p>
+          <div class="feedback-name">— Mahasiswa Kedokteran</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- HALAMAN PERMAINAN (sudah cantik dari versi sebelumnya) -->
+  <div id="game" class="page">
+    <section style="padding-top:140px;">
+      <h2>Mindscape: Kartu Peer Support</h2>
+      <p style="font-size:1.3rem;max-width:900px;margin:0 auto 60px;color:#555;">
+        Permainan interaktif untuk saling berbagi cerita, belajar dari pengalaman satu sama lain, dan mempererat hubungan.
+      </p>
+
+      <h2 style="font-size:3rem;margin:80px 0 60px;">Papan Permainan</h2>
+      <img src="https://i.ibb.co/5n7YvK8/mindscape-board-final.png" alt="Papan Mindscape" class="game-board-img">
+
+      <h2 style="font-size:3rem;margin:100px 0 60px;">Contoh Kartu</h2>
+      <div class="cards-grid">
+        <div class="card-example"><strong>About my peer</strong><p>“Jika kamu diberi ruang aman untuk bercerita tanpa takut dihakimi, hal apa yang paling ingin kamu sampaikan?”</p></div>
+        <div class="card-example"><strong>About myself</strong><p>“Jika harus menggambarkan hubunganmu dengan media sosial dalam satu kata, itu apa dan mengapa?”</p></div>
+        <div class="card-example"><strong>About my study</strong>
+          <img src="https://i.ibb.co/0jK6Y8F/about-study-card.png" alt="Kartu studi" style="border-radius:20px;width:100%;margin:20px 0;">
+          <p>Apa alasan terbesarmu untuk bertahan di sini sampai lulus?</p>
+        </div>
+      </div>
+
+      <h2 style="font-size:3rem;margin:100px 0 60px;">Cara Bermain</h2>
+      <div class="how-to">
+        <ol>
+          <li>Dimainkan <strong>2–4 orang</strong>.</li>
+          <li>Setiap pemain mulai dari kotak <strong>1 (START)</strong>.</li>
+          <li>Lempar dadu, maju sesuai angka.</li>
+          <li>Berhenti di kotak <strong>kuning</strong> → ambil 1 kartu & jawab pertanyaan dengan jujur.</li>
+          <li>Pemain lain mendengarkan tanpa menghakimi.</li>
+          <li>Ada <strong>tangga</strong> (naik cepat) dan <strong>ular</strong> (turun).</li>
+        </ol>
+        <p style="margin-top:50px;font-size:1.5rem;color:var(--green);font-weight:700;text-align:center;">
+          Tujuan utama bukan menang, tapi saling terbuka dan mendukung.
+        </p>
+      </div>
+
+      <p style="font-size:1.6rem;font-style:italic;max-width:900px;margin:100px auto;color:#555;">
+        “Semakin jujur kalian bermain, semakin dalam koneksi yang terbentuk.”
+      </p>
+
+      <button class="btn btn-primary" onclick="showPage('home')">← Kembali ke Beranda</button>
+    </section>
+  </div>
+
+  <!-- SURVEY -->
+  <div id="survey" class="page">
+    <section>
+      <h1 style="color:var(--purple);margin-bottom:20px;">Survey Kepuasan Peer Counseling</h1>
+      <p style="font-size:1.3rem;max-width:700px;margin:0 auto 50px;">Bantu kami jadi lebih baik. Hanya 2 menit!</p>
+      <div class="survey-container">
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScmXlo6aa7fprZlhaKaWCjx3N9qKxeBznauzCJ7NjMgiVjzKA/viewform?embedded=true" frameborder="0">Loading…</iframe>
+      </div>
+      <button class="back-btn" onclick="showPage('home')">Kembali ke Beranda</button>
+    </section>
+  </div>
+
+  <footer>
+    © 2025 MINDSCAPE | Kelompok 3<br>
+    <a href="mailto:mindscapecard@gmail.com">mindscapecard@gmail.com</a>
+  </footer>
+
+  <script>
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+      document.querySelector(`nav a[onclick="showPage('${id}')"]`)?.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+  </script>
+</body>
+</html>
